@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Data table</title>
+    <!-- Inclure Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+</h:head>
+
+<h:body>
+    <h:outputText styleClass="titre" value="Liste Des Employés" />
+    <h:dataTable value="#{controllerBean.getListeEmploye}" var="employe"
+                 styleClass="table table-bordered table-striped">
+        <h:column styleClass="bg-primary">
+            <f:facet name="header">Numéro</f:facet>
+            <h:outputText value="#{employe.id}" />
+        </h:column>
+        <h:column styleClass="bg-secondary">
+            <f:facet name="header">Nom</f:facet>
+            <h:outputText value="#{employe.nom}" />
+        </h:column>
+        <h:column styleClass="bg-success">
+            <f:facet name="header">Prénom</f:facet>
+            <h:outputText value="#{employe.prenom}" />
+        </h:column>
+        <h:column styleClass="bg-warning">
+            <f:facet name="header">Date De Naissance</f:facet>
+            <h:outputText value="#{employe.dateNaissance}" />
+        </h:column>
+        <h:column styleClass="bg-info">
+            <f:facet name="header">Email</f:facet>
+            <h:outputText value="#{employe.email}" />
+        </h:column>
+        <h:column>
+            <f:facet name="header">Action</f:facet>
+            <h:form>
+                <h:commandButton value="Select" styleClass="btn btn-danger" action="#{controllerBean.setEmploye(employe)}" />
+            </h:form>
+        </h:column>
+    </h:dataTable>
+    
+    <h:commandButton value="Previous" styleClass="btn btn-danger" action="#{controllerBean.previousPage}" rendered="#{controllerBean.currentPage ge 1}" />
+    <h:outputText value=" #{controllerBean.currentPage} / #{controllerBean.getTotalPages()} " />
+    <h:commandButton value="Next" styleClass="btn btn-danger" action="#{controllerBean.nextPage}" rendered="#{controllerBean.currentPage lt controllerBean.getTotalPages()}" />
+    
+    <h:form>
+        <h:panelGrid columns="2">
+            <h:outputLabel for="id">ID:</h:outputLabel>
+            <h:inputText id="id" value="#{controllerBean.employe.id}" />
+
+            <h:outputLabel for="nom">Nom:</h:outputLabel>
+            <h:inputText id="nom" value="#{controllerBean.employe.nom}" />
+
+            <h:outputLabel for="prenom">Prénom:</h:outputLabel>
+            <h:inputText id="prenom" value="#{controllerBean.employe.prenom}" />
+
+            <h:outputLabel for="dateNaissance">Date de Naissance (sous la forme "yyyy-MM-dd"):</h:outputLabel>
+            <h:inputText id="dateNaissance" value="#{controllerBean.employe.dateNaissance}" converter="jakarta.faces.DateTime">
+                <f:convertDateTime pattern="yyyy-MM-dd" />
+            </h:inputText>
+
+            <h:outputLabel for="email">Email:</h:outputLabel>
+            <h:inputText id="email" value="#{controllerBean.employe.email}" />
+
+            <h:commandButton value="Add" styleClass="btn btn-danger" action="#{controllerBean.addEmploye}" />
+            <h:commandButton value="Edit" styleClass="btn btn-danger" action="#{controllerBean.editEmploye}" />
+            <h:commandButton value="Delete" styleClass="btn btn-danger" action="#{controllerBean.deleteEmploye}" />
+            <h:commandButton value="Cancel" styleClass="btn btn-danger" action="#{controllerBean.cancelEmploye}" />
+        </h:panelGrid>
+    </h:form>
+</h:body>
+
+</html>
