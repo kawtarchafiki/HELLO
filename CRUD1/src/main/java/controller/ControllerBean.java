@@ -21,55 +21,40 @@ import model.Employe;
 public class ControllerBean {
 	private List<Employe> employeList;
 	private Employe employe=new Employe();
-	private int currentPage = 1;
-    private int recordsPerPage = 10;
-    
-    public List<Employe> getGetListeEmploye() {
-        int startRecord = (currentPage - 1) * recordsPerPage;
-        int endRecord = startRecord + recordsPerPage;
+	
+
+
+
+	public List<Employe> getGetListeEmploye() {
+        
 
         List<Employe> employes = new ArrayList<>();
-        Connection con = null;
         try {
+            Connection con = null;
             DbConnexion dbConnexion = new DbConnexion();
             con = dbConnexion.getConnection();
 
-            String query = "SELECT * FROM employe LIMIT ?, ?";
-
+            String query = "SELECT * FROM employe";
             try (PreparedStatement statement = con.prepareStatement(query)) {
-                statement.setInt(1, startRecord);
-                statement.setInt(2, recordsPerPage);
 
-                ResultSet resultSet = statement.executeQuery();
-
-                while (resultSet.next()) {
-                    Employe employe = new Employe();
-                    employe.setId(resultSet.getInt("id"));
-                    employe.setNom(resultSet.getString("nom"));
-                    employe.setPrenom(resultSet.getString("prenom"));
-                    employe.setDateNaissance(resultSet.getDate("dateNaissance"));
-                    employe.setEmail(resultSet.getString("email"));
-
-                    employes.add(employe);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        Employe employe = new Employe();
+                        employe.setId(resultSet.getInt("id"));
+                        employe.setNom(resultSet.getString("nom"));
+                        employe.setPrenom(resultSet.getString("prenom"));
+                        employe.setDateNaissance(resultSet.getDate("dateNaissance"));
+                        employe.setEmail(resultSet.getString("email"));
+                        employes.add(employe);
+                    }
                 }
             }
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query: " + e.getMessage());
-        } finally {
-            try {
-                if (con != null) {
-                    con.close();
-                }
-            } catch (SQLException e) {
-                System.out.println("Error closing database connection: " + e.getMessage());
-            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
-
         return employes;
     }
-	
-	
-	
+
 	
 	    public void setEmployeList(List<Employe> employeList) {
 			this.employeList=employeList;
@@ -85,30 +70,6 @@ public class ControllerBean {
 		    this.employe = employe;
 	    }
 	    
-	    
-	    
-		public int getCurrentPage() {
-			return currentPage;
-		}
-
-
-		public void setCurrentPage(int currentPage) {
-			this.currentPage = currentPage;
-		}
-
-
-		public int getRecordsPerPage() {
-			return recordsPerPage;
-		}
-
-
-		public void setRecordsPerPage(int recordsPerPage) {
-			this.recordsPerPage = recordsPerPage;
-		}
-		public void init() {
-	        updateEmployeList();
-	    }
-
 
 		public void addEmploye() {
 		    Connection con = null;
@@ -153,8 +114,6 @@ public class ControllerBean {
 		            System.out.println("Error closing database connection: " + e.getMessage());
 		        }
 		    }
-            updateEmployeList();
-
 		}
 
 
@@ -175,11 +134,11 @@ public class ControllerBean {
 			            System.out.println("Error checking email uniqueness: " + e.getMessage());
 			        }
 			        return false; 
-			        
 			}
 			 
 			 
 			 public void editEmploye() {
+				
 				    Connection con = null;
 				    try {
 				        FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -190,11 +149,10 @@ public class ControllerBean {
 				        DbConnexion dbConnexion = new DbConnexion();
 				        con = dbConnexion.getConnection();
 
-				        // Récupérer l'ancien e-mail avant la modification
 				        String oldEmail = getOldEmailFromDatabase(con, this.employe.getId());
 				        this.employe.setOldEmail(oldEmail);
 
-				        // Vérifier l'unicité de l'e-mail uniquement si l'e-mail est modifié
+				       
 				        if (!this.employe.getEmail().equals(oldEmail) && !isEmailUnique(con, this.employe.getEmail())) {
 				            out.print("Error: Email is not unique");
 				            return;
@@ -232,11 +190,9 @@ public class ControllerBean {
 				            System.out.println("Error closing database connection: " + e.getMessage());
 				        }
 				    }
-		            updateEmployeList();
-
 				}
 
-				// Méthode pour obtenir l'ancien e-mail depuis la base de données
+				
 				private String getOldEmailFromDatabase(Connection con, int employeId) {
 				    try {
 				        String query = "SELECT email FROM employe WHERE id = ?";
@@ -296,8 +252,6 @@ public class ControllerBean {
 				            System.out.println("Error closing database connection: " + e.getMessage());
 				        }
 				    }
-		            updateEmployeList();
-
 				}
 			 
 			 
@@ -339,33 +293,10 @@ public class ControllerBean {
 				    }
 
 				    return totalRecords;
-				}
+			 }
 
-			 
-			 
-			 
-			 public void nextPage() {
-				    if (currentPage < getTotalPages()) {
-				        currentPage++;
-				        updateEmployeList();
-				    }
-				}
 
-				public void previousPage() {
-				    if (currentPage > 1) {
-				        currentPage--;
-				        updateEmployeList();
-				    }
-				}
-				public void updateEmployeList() {
-			        employeList = getGetListeEmploye();
-			    }
 
-				public int getTotalPages() {
-				    // Calculate total pages based on the total number of records and records per page
-				    int totalRecords = getTotalRecords(); // Implement a method to get the total number of records
-				    return (int) Math.ceil((double) totalRecords / recordsPerPage);
-				}
 
 
 
